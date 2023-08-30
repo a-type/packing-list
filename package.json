@@ -1,0 +1,19 @@
+{
+	"name": "@packing-list/root",
+	"version": "1.0.0",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"test": "turbo run test",
+		"prisma": "pnpm --filter @packing-list/prisma run prisma",
+		"generate": "pnpm --filter @packing-list/verdant run generate"
+	},
+	"devDependencies": {
+		"turbo": "^1.6.1"
+	}
+}
