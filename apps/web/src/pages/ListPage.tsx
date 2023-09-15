@@ -7,6 +7,8 @@ import {
   PageFixedArea,
   PageRoot,
 } from '@a-type/ui/components/layouts';
+import { DialogActions, DialogClose } from '@a-type/ui/components/dialog';
+import { Button } from '@a-type/ui/components/button';
 
 export interface ListPageProps {}
 
@@ -15,14 +17,18 @@ export function ListPage({}: ListPageProps) {
   const listId = params.listId;
 
   return (
-    <PageContent>
-      <PageFixedArea className="py-2">
-        <Link to="/lists">Back to lists</Link>
-      </PageFixedArea>
-      <Suspense>
-        <ListPageEditor listId={listId} />
-      </Suspense>
-    </PageContent>
+    <>
+      <div className="flex-1">
+        <Suspense>
+          <ListPageEditor listId={listId} />
+        </Suspense>
+      </div>
+      <DialogActions>
+        <DialogClose asChild>
+          <Button>Close</Button>
+        </DialogClose>
+      </DialogActions>
+    </>
   );
 }
 

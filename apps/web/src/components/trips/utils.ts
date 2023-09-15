@@ -17,7 +17,7 @@ export function getComputedQuantity({
   return (
     additional +
     (roundDown
-      ? Math.floor(quantity * days * perDays)
-      : Math.ceil(quantity * days * perDays))
+      ? Math.floor((quantity * days) / perDays)
+      : Math.ceil((quantity * days) / perDays))
   );
 }

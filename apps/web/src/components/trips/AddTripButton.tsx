@@ -7,6 +7,7 @@ export function AddTripButton({}: AddTripButtonProps) {
   const client = hooks.useClient();
   return (
     <Button
+      color="primary"
       onClick={() => {
         client.trips.put({});
       }}

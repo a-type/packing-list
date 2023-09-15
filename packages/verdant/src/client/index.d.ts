@@ -264,21 +264,7 @@ export type TripCompletionsSnapshot = Record<
   string,
   TripCompletionsValueSnapshot
 >;
-export type TripCompletionsValue = ObjectEntity<
-  TripCompletionsValueInit,
-  TripCompletionsValueDestructured
->;
-export type TripCompletionsValueInit = {
-  quantity: number;
-};
-export type TripCompletionsValueDestructured = {
-  quantity: number;
-};
-export type TripCompletionsValueSnapshot = {
-  quantity: number;
-};
-export type TripCompletionsValueQuantity = number;
-export type TripCompletionsValueQuantityInit = TripCompletionsValueQuantity;
-export type TripCompletionsValueQuantitySnapshot = TripCompletionsValueQuantity;
-export type TripCompletionsValueQuantityDestructured =
-  TripCompletionsValueQuantity;
+export type TripCompletionsValue = number;
+export type TripCompletionsValueInit = TripCompletionsValue;
+export type TripCompletionsValueSnapshot = TripCompletionsValue;
+export type TripCompletionsValueDestructured = TripCompletionsValue;

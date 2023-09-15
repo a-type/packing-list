@@ -17,6 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@a-type/ui/components/select';
+import { AddListsPicker } from '@/components/trips/AddListsPicker.jsx';
+import { useSearchParams } from '@verdant-web/react-router';
+import {
+  TabsContent,
+  TabsList,
+  TabsRoot,
+  TabsTrigger,
+} from '@a-type/ui/components/tabs';
+import { LiveUpdateTextField } from '@a-type/ui/components/liveUpdateTextField';
 
 export interface TripViewProps {
   tripId: string;
@@ -30,10 +39,10 @@ export function TripView({ tripId }: TripViewProps) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <TripViewInfo trip={trip} />
+      <AddListsPicker trip={trip} />
       <TripViewChecklists trip={trip} />
-      <TripViewAddList trip={trip} />
     </div>
   );
 }
@@ -42,8 +51,12 @@ function TripViewInfo({ trip }: { trip: Trip }) {
   const { name, createdAt, days } = hooks.useWatch(trip);
   return (
     <div>
-      <h1>{name}</h1>
-      <p>{createdAt}</p>
+      <LiveUpdateTextField
+        value={name}
+        onChange={(v) => trip.set('name', v)}
+        className="text-xl"
+      />
+      <p>Created on {new Date(createdAt).toLocaleDateString()}</p>
       <div className="flex flex-row items-center gap-2">
         <NumberStepper
           value={days}
@@ -53,33 +66,6 @@ function TripViewInfo({ trip }: { trip: Trip }) {
         <span>days</span>
       </div>
     </div>
-  );
-}
-
-function TripViewAddList({ trip }: { trip: Trip }) {
-  const lists = hooks.useAllLists();
-
-  return (
-    <Select
-      value=""
-      onValueChange={(val) => {
-        if (val) trip.get('lists').add(val);
-      }}
-    >
-      <SelectTrigger>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="" disabled>
-          Add a list
-        </SelectItem>
-        {lists.map((list) => (
-          <SelectItem key={list.get('id')} value={list.get('id')}>
-            {list.get('name')}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   );
 }
 
@@ -94,16 +80,42 @@ function TripViewChecklists({ trip }: { trip: Trip }) {
       return x !== undefined;
     });
 
+  const [params, setParams] = useSearchParams();
+  const activeList = params.get('list') ?? lists.get(0);
+
+  if (!activeList) {
+    return <div>Add a list to start packing</div>;
+  }
+
   return (
     <div>
-      {mappedLists.map((list) => (
-        <TripViewChecklist
-          key={list.get('id')}
-          list={list}
-          days={days}
-          completions={completions}
-        />
-      ))}
+      <TabsRoot
+        value={activeList}
+        onValueChange={(val) => {
+          setParams((params) => {
+            params.set('list', val);
+            return params;
+          });
+        }}
+      >
+        <TabsList className="important:justify-start">
+          {mappedLists.map((list) => (
+            <TabsTrigger key={list.get('id')} value={list.get('id')}>
+              {list.get('name')}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {mappedLists.map((list) => (
+          <TabsContent key={list.get('id')} value={list.get('id')}>
+            <TripViewChecklist
+              key={list.get('id')}
+              list={list}
+              days={days}
+              completions={completions}
+            />
+          </TabsContent>
+        ))}
+      </TabsRoot>
     </div>
   );
 }
@@ -117,41 +129,28 @@ function TripViewChecklist({
   days: number;
   completions: TripCompletions;
 }) {
-  const { name, items } = hooks.useWatch(list);
+  const { items } = hooks.useWatch(list);
   hooks.useWatch(items);
   hooks.useWatch(completions);
 
-  useEffect(() => {
-    items.forEach((item) => {
-      if (!completions.get(item.get('id'))) {
-        completions.set(item.get('id'), {
-          quantity: 0,
-        });
-      }
-    });
-  }, [items, completions]);
-
   return (
-    <div>
-      <h2>{name}</h2>
-      <ul className="list-none flex flex-col gap-3 m-0 p-0">
-        {items.map((item) => {
-          const completion = completions.get(item.get('id'));
-          if (!completion) {
-            return null;
-          }
-          return (
-            <li key={item.get('id')} className="m-0 p-0">
-              <TripViewChecklistItem
-                item={item}
-                days={days}
-                completion={completion}
-              />
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <ul className="list-none flex flex-col gap-3 m-0 p-0">
+      {items.map((item) => {
+        const completion = completions.get(item.get('id')) ?? 0;
+        return (
+          <li key={item.get('id')} className="m-0 p-0">
+            <TripViewChecklistItem
+              item={item}
+              days={days}
+              completion={completion}
+              onCompletionChanged={(value) => {
+                completions.set(item.get('id'), value);
+              }}
+            />
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -159,15 +158,16 @@ function TripViewChecklistItem({
   item,
   days,
   completion,
+  onCompletionChanged,
 }: {
   item: ListItemsItem;
   days: number;
   completion: TripCompletionsValue;
+  onCompletionChanged: (completion: TripCompletionsValue) => void;
 }) {
   const { description, perDays, quantity, additional, roundDown } =
     hooks.useWatch(item);
-  hooks.useWatch(completion);
-  const completedQuantity = completion?.get('quantity') ?? 0;
+  const completedQuantity = completion;
   const computedQuantity = getComputedQuantity({
     perDays,
     quantity,
@@ -179,44 +179,45 @@ function TripViewChecklistItem({
 
   const mainOnChecked = (checked: boolean) => {
     if (checked) {
-      completion?.set('quantity', computedQuantity);
+      onCompletionChanged(computedQuantity);
     } else {
-      completion?.set('quantity', 0);
+      onCompletionChanged(0);
     }
   };
   const subOnChecked = (checked: boolean) => {
     if (checked) {
-      completion?.set('quantity', completedQuantity + 1);
+      onCompletionChanged(completedQuantity + 1);
     } else {
-      completion?.set('quantity', completedQuantity - 1);
+      onCompletionChanged(completedQuantity - 1);
     }
   };
 
-  if (computedQuantity > 1) {
-    return (
-      <div className="w-full">
-        <div className="w-full flex flex-row items-center gap-2">
-          <Checkbox checked={completed} onCheckedChange={mainOnChecked} />
-          <label>{description}</label>
-        </div>
-        <ul className="list-none m-0 ml-6 p-0 flex flex-row items-center gap-1 flex-wrap w-full">
+  return (
+    <div className="w-full border border-solid border-gray-4 rounded-lg p-2 flex flex-col gap-2">
+      <div className="w-full flex flex-row items-center gap-2">
+        {computedQuantity === 1 && (
+          <Checkbox
+            checked={completed}
+            onCheckedChange={mainOnChecked}
+            className="w-32px h-32px"
+          />
+        )}
+        <label>{description}</label>
+        <span className="text-gray-7">×{computedQuantity}</span>
+      </div>
+      {computedQuantity > 1 && (
+        <ul className="list-none m-0 p-0 grid grid-cols-[repeat(auto-fit,minmax(32px,1fr))] [grid-auto-rows:32px] items-center gap-1">
           {Array.from({ length: computedQuantity }).map((_, i) => (
-            <li key={i} className="m-0 p-0">
+            <li key={i} className="m-0 p-0 flex-1 min-w-32px">
               <Checkbox
                 checked={i < completedQuantity}
                 onCheckedChange={subOnChecked}
+                className="w-full h-32px"
               />
             </li>
           ))}
         </ul>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full flex flex-row items-center gap-2">
-      <Checkbox checked={completed} onCheckedChange={mainOnChecked} />
-      <label>{description}</label>
+      )}
     </div>
   );
 }

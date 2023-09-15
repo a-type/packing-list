@@ -81,12 +81,7 @@ const trips = collection({
         completions: {
             type: 'map',
             values: {
-                type: 'object',
-                properties: {
-                    quantity: {
-                        type: 'number'
-                    }
-                }
+                type: 'number'
             }
         }
     }

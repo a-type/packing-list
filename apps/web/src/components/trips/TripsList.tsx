@@ -1,7 +1,12 @@
-import { AddTripButton } from '@/components/trips/AddTripButton.jsx';
+import { useTripProgress } from '@/components/trips/hooks.js';
 import { hooks } from '@/store.js';
 import { Button } from '@a-type/ui/components/button';
-import { CardMain, CardRoot } from '@a-type/ui/components/card';
+import {
+  CardFooter,
+  CardGrid,
+  CardMain,
+  CardRoot,
+} from '@a-type/ui/components/card';
 import { Trip } from '@packing-list/verdant';
 import { Link } from '@verdant-web/react-router';
 
@@ -19,15 +24,11 @@ export function TripsList({}: TripsListProps) {
 
   return (
     <div>
-      <h1>Trips</h1>
-      <AddTripButton />
-      <ul className="list-none p-0 m-0">
+      <CardGrid className="list-none p-0 m-0">
         {trips.map((trip) => (
-          <li key={trip.get('id')} className="p-0 m-0">
-            <TripsListItem trip={trip} />
-          </li>
+          <TripsListItem key={trip.get('id')} trip={trip} />
         ))}
-      </ul>
+      </CardGrid>
       {tools.hasMore && (
         <Button onClick={() => tools.loadMore()}>Show older</Button>
       )}
@@ -36,13 +37,24 @@ export function TripsList({}: TripsListProps) {
 }
 
 function TripsListItem({ trip }: { trip: Trip }) {
-  const { name } = hooks.useWatch(trip);
+  const { name, createdAt } = hooks.useWatch(trip);
+
+  const { value: completion } = useTripProgress(trip);
 
   return (
     <CardRoot>
       <CardMain asChild>
-        <Link to={`/trips/${trip.get('id')}`}>{name}</Link>
+        <Link to={`/trips/${trip.get('id')}`} className="relative bg-white">
+          <span className="relative z-1">{name}</span>
+          <div
+            className="absolute left-0 top-0 bottom-0 bg-accent-wash"
+            style={{
+              width: `${completion * 100}%`,
+            }}
+          />
+        </Link>
       </CardMain>
+      <CardFooter>{new Date(createdAt).toLocaleDateString()}</CardFooter>
     </CardRoot>
   );
 }
