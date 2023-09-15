@@ -39,7 +39,12 @@ function ListItemsEditor({ list }: { list: List }) {
     <ul className="mb-2 list-none mx-0 px-0 grid grid-cols-[1fr] gap-3 md:(grid-cols-[repeat(auto-fill,minmax(300px,1fr))] [grid-auto-rows:1fr])">
       {items.map((item) => (
         <li key={item.get('id')}>
-          <ListItemEditor item={item} />
+          <ListItemEditor
+            item={item}
+            onDelete={() => {
+              items.removeAll(item);
+            }}
+          />
         </li>
       ))}
       <li>
@@ -49,15 +54,27 @@ function ListItemsEditor({ list }: { list: List }) {
   );
 }
 
-function ListItemEditor({ item }: { item: ListItemsItem }) {
+function ListItemEditor({
+  item,
+  onDelete,
+}: {
+  item: ListItemsItem;
+  onDelete: () => void;
+}) {
   const { description, quantity, additional, perDays, roundDown } =
     hooks.useWatch(item);
   return (
     <div className="flex flex-col gap-3 border border-solid border-gray-5 p-2 rounded-lg w-full h-full">
-      <LiveUpdateTextField
-        value={description}
-        onChange={(v) => item.set('description', v)}
-      />
+      <div className="flex flex-row justify-between items-center">
+        <LiveUpdateTextField
+          value={description}
+          onChange={(v) => item.set('description', v)}
+          className="flex-1"
+        />
+        <Button size="icon" color="ghostDestructive" onClick={onDelete}>
+          <div className="i-solar-trash-bin-minimalistic-linear" />
+        </Button>
+      </div>
       <div className="flex flex-col gap-1">
         <FieldGroup>
           <FieldLabel>Pack</FieldLabel>
