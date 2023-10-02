@@ -25,10 +25,10 @@ export function Navigation({}: NavigationProps) {
           className="[&[data-active=true]]:(bg-primary-wash color-black)"
         >
           <Link to="/trips" data-active={matchTrips}>
-            <NavBarItemText>Trips</NavBarItemText>
             <NavBarItemIconWrapper>
               <NavBarItemIcon className="i-solar-suitcase-tag-linear" />
             </NavBarItemIconWrapper>
+            <NavBarItemText>Trips</NavBarItemText>
           </Link>
         </NavBarItem>
         <NavBarItem
@@ -36,10 +36,10 @@ export function Navigation({}: NavigationProps) {
           className="[&[data-active=true]]:(bg-primary-wash color-black)"
         >
           <Link to="/lists" data-active={matchLists}>
-            <NavBarItemText>Lists</NavBarItemText>
             <NavBarItemIconWrapper>
               <NavBarItemIcon className="i-solar-checklist-linear" />
             </NavBarItemIconWrapper>
+            <NavBarItemText>Lists</NavBarItemText>
           </Link>
         </NavBarItem>
       </NavBarRoot>
