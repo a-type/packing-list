@@ -28,7 +28,7 @@ export function RouteDialog(props: RouteDialogProps) {
             }
           }}
         >
-          <DialogContent className="important:(max-h-none h-90vh) important:md:(max-w-75vw)">
+          <DialogContent className="important:(max-h-none h-90vh) important:sm:(max-w-75vw)">
             <Suspense>
               {match ? <RouteRenderer value={match} params={params} /> : null}
             </Suspense>

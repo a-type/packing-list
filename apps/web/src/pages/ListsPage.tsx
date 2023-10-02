@@ -5,7 +5,11 @@ import {
   NavigationTabsRoot,
 } from '@/components/nav/NavigationTabs.jsx';
 import { RouteDialog } from '@/components/nav/RouteDialog.jsx';
-import { PageContent, PageFixedArea } from '@a-type/ui/components/layouts';
+import {
+  PageContent,
+  PageFixedArea,
+  PageNowPlaying,
+} from '@a-type/ui/components/layouts';
 import { TabsList } from '@a-type/ui/components/tabs';
 
 export interface ListsPageProps {}
@@ -13,17 +17,11 @@ export interface ListsPageProps {}
 export function ListsPage({}: ListsPageProps) {
   return (
     <PageContent>
-      <PageFixedArea className="flex flex-col items-start gap-2">
-        <NavigationTabsRoot className="w-full">
-          <TabsList>
-            <NavigationTab value="/trips">Trips</NavigationTab>
-            <NavigationTab value="/lists">Lists</NavigationTab>
-          </TabsList>
-        </NavigationTabsRoot>
-        <AddListButton>New list</AddListButton>
-      </PageFixedArea>
       <ListsList />
       <RouteDialog />
+      <PageNowPlaying unstyled>
+        <AddListButton>New list</AddListButton>
+      </PageNowPlaying>
     </PageContent>
   );
 }

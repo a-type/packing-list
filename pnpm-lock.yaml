@@ -96,14 +96,17 @@ importers:
   apps/web:
     dependencies:
       '@a-type/ui':
-        specifier: ^0.1.11
-        version: 0.1.11(@types/react-dom@18.2.7)(@types/react@18.2.21)
+        specifier: ^0.1.12
+        version: 0.1.12(@types/react-dom@18.2.7)(@types/react@18.2.21)
       '@a-type/utils':
         specifier: ^1.0.4
         version: 1.0.4
       '@packing-list/verdant':
         specifier: workspace:*
         version: link:../../packages/verdant
+      '@radix-ui/react-progress':
+        specifier: ^1.0.3
+        version: 1.0.3(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-toggle-group':
         specifier: ^1.0.4
         version: 1.0.4(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
@@ -116,9 +119,18 @@ importers:
       '@unocss/transformer-variant-group':
         specifier: ^0.54.1
         version: 0.54.1
+      '@verdant-web/cli':
+        specifier: ^2.2.1
+        version: 2.2.1
+      '@verdant-web/react':
+        specifier: ^21.1.2
+        version: 21.1.2(@verdant-web/store@2.5.8)(react@18.2.0)
       '@verdant-web/react-router':
         specifier: ^0.5.3
         version: 0.5.3(react@18.2.0)
+      '@verdant-web/store':
+        specifier: ^2.5.8
+        version: 2.5.8
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
@@ -217,8 +229,8 @@ importers:
 
 packages:
 
-  /@a-type/ui@0.1.11(@types/react-dom@18.2.7)(@types/react@18.2.21):
-    resolution: {integrity: sha512-WNc8jxWr/ElcXYkVnV7SFeWmCQ8ZIR02QRHgapoyrULsgUNr0W7Gi/pfEyf/T1Hu3H9+8wzDqfQAozVLvyIWbg==}
+  /@a-type/ui@0.1.12(@types/react-dom@18.2.7)(@types/react@18.2.21):
+    resolution: {integrity: sha512-VWE7E99jWj6aVL/bdRhwRpIxnemsXec9peOcTANR/EoHPlCePVZ91SsQBjsrTmJZIVwpXFJRzAOpxnNzhU4flA==}
     dependencies:
       '@a-type/utils': 1.0.4
       '@radix-ui/react-accordion': 1.1.2(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
@@ -2575,6 +2587,28 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /@radix-ui/react-progress@1.0.3(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-5G6Om/tYSxjSeEdrb1VfKkfZfn/1IlPWd731h2RfPuSbIfNUgfqAwbKfJCg/PP6nuUCTrYzalwHSpSinoWoCag==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.22.11
+      '@radix-ui/react-context': 1.0.1(@types/react@18.2.21)(react@18.2.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
+      '@types/react': 18.2.21
+      '@types/react-dom': 18.2.7
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /@radix-ui/react-radio-group@1.1.3(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-x+yELayyefNeKeTx4fjK6j99Fs6c4qKm3aY38G3swQVTN6xMpsrbigC0uHs2L//g8q4qR7qOcww8430jJmi2ag==}
     peerDependencies:
@@ -3999,8 +4033,27 @@ packages:
       - '@swc/helpers'
     dev: false
 
+  /@verdant-web/cli@2.2.1:
+    resolution: {integrity: sha512-2cOm7OKyxg7NLYPeO7xaq+MAeUTmpgTNgQtfUSe8+PAGLFhhXsIsxnMBbN9yt/k6qA8/fr9bA2tc0X2qUzjlsg==}
+    hasBin: true
+    dependencies:
+      '@swc/core': 1.3.80
+      change-case: 4.1.2
+      prettier: 2.8.8
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - '@swc/helpers'
+    dev: false
+
   /@verdant-web/common@1.13.4:
     resolution: {integrity: sha512-25b/n+lc4TC3cX2+0srzBqu7ir/4RRFv05TGQW4/wsUDZmm4HPiBRBWwWktdCLJ8wFAajn4JKisCV5zIFl8Q9Q==}
+    dependencies:
+      cuid: 2.1.8
+      uuid: 8.3.2
+    dev: false
+
+  /@verdant-web/common@1.14.0:
+    resolution: {integrity: sha512-ME6q0s+jtRdnLQ/DSyBjldwt/S7lKKE16FCa3YoOrkhlWTYvlVF4j0cto79kd5HDaIOmYXdpv/5SaFWeI4Pjfg==}
     dependencies:
       cuid: 2.1.8
       uuid: 8.3.2
@@ -4028,6 +4081,19 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
+  /@verdant-web/react@21.1.2(@verdant-web/store@2.5.8)(react@18.2.0):
+    resolution: {integrity: sha512-OqKhzVabaqYVvIxwMK+DPTU32pvDfUzXHPQzUOWc9DvcJ+pL1uPM+dU41Ja32qIt3r8mgyper8JIL+JgCWh1Kg==}
+    peerDependencies:
+      '@verdant-web/store': ^2.5.8
+      react: ^18.2.0
+    dependencies:
+      '@verdant-web/common': 1.14.0
+      '@verdant-web/store': 2.5.8
+      react: 18.2.0
+      suspend-react: 0.0.8(react@18.2.0)
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
   /@verdant-web/server@1.8.8(utf-8-validate@5.0.9):
     resolution: {integrity: sha512-FHAyXrMHFxUGfJMMK/re/ANX7+aJcVf5SsBOxIbTl/nvORE30yBB3lniHk+GznoGS3UEVpQ3nl7TGmjrCEpJ8w==}
     dependencies:
@@ -4046,6 +4112,14 @@ packages:
     resolution: {integrity: sha512-2HcJfvhpH4H9jsvCDZmj6l2o85aUxibbqbZZ9+WRrNTLabqvX3zCxoKZv9h4/PM7fSINRGzPYI6822yGczmT2w==}
     dependencies:
       '@verdant-web/common': 1.13.4
+      cuid: 2.1.8
+      jwt-decode: 3.1.2
+    dev: false
+
+  /@verdant-web/store@2.5.8:
+    resolution: {integrity: sha512-fPFtqKcuf2BrPcIUBDYolhziIalnVdT+f9dLrUzcN+KNDbszFwtChxB5sWKPUlL/MoiPMz0gGqcTSfL4WRwSgQ==}
+    dependencies:
+      '@verdant-web/common': 1.14.0
       cuid: 2.1.8
       jwt-decode: 3.1.2
     dev: false

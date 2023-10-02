@@ -39,7 +39,11 @@ export function TripsList({}: TripsListProps) {
 function TripsListItem({ trip }: { trip: Trip }) {
   const { name, createdAt } = hooks.useWatch(trip);
 
-  const { value: completion } = useTripProgress(trip);
+  const {
+    value: completion,
+    totalItems,
+    completedItems,
+  } = useTripProgress(trip);
 
   return (
     <CardRoot>
@@ -54,7 +58,10 @@ function TripsListItem({ trip }: { trip: Trip }) {
           />
         </Link>
       </CardMain>
-      <CardFooter>{new Date(createdAt).toLocaleDateString()}</CardFooter>
+      <CardFooter className="text-xs">
+        {new Date(createdAt).toLocaleDateString()} | {completedItems} /{' '}
+        {totalItems} items
+      </CardFooter>
     </CardRoot>
   );
 }

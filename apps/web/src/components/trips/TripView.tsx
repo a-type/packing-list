@@ -9,7 +9,7 @@ import {
 } from '@packing-list/verdant';
 import { Checkbox } from '@a-type/ui/components/checkbox';
 import { getComputedQuantity } from '@/components/trips/utils.js';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectItem,
@@ -26,6 +26,16 @@ import {
   TabsTrigger,
 } from '@a-type/ui/components/tabs';
 import { LiveUpdateTextField } from '@a-type/ui/components/liveUpdateTextField';
+import {
+  CollapsibleContent,
+  CollapsibleRoot,
+  CollapsibleSimple,
+} from '@a-type/ui/components/collapsible';
+import { Button } from '@a-type/ui/components/button';
+import { H4 } from '@a-type/ui/components/typography';
+import * as Progress from '@radix-ui/react-progress';
+import { Icon } from '@a-type/ui/components/icon';
+import { useTripProgress } from '@/components/trips/hooks.js';
 
 export interface TripViewProps {
   tripId: string;
@@ -41,7 +51,6 @@ export function TripView({ tripId }: TripViewProps) {
   return (
     <div className="flex flex-col gap-2">
       <TripViewInfo trip={trip} />
-      <AddListsPicker trip={trip} />
       <TripViewChecklists trip={trip} />
     </div>
   );
@@ -57,6 +66,7 @@ function TripViewInfo({ trip }: { trip: Trip }) {
         className="text-xl"
       />
       <p>Created on {new Date(createdAt).toLocaleDateString()}</p>
+      {/* TODO: date picker */}
       <div className="flex flex-row items-center gap-2">
         <NumberStepper
           value={days}
@@ -81,11 +91,10 @@ function TripViewChecklists({ trip }: { trip: Trip }) {
     });
 
   const [params, setParams] = useSearchParams();
-  const activeList = params.get('list') ?? lists.get(0);
+  const activeList = (params.get('list') ?? lists.get(0)) || '';
 
-  if (!activeList) {
-    return <div>Add a list to start packing</div>;
-  }
+  const [editingLists, setEditingLists] = useState(lists.length === 0);
+  const [startedWithNoLists] = useState(editingLists);
 
   return (
     <div>
@@ -98,13 +107,35 @@ function TripViewChecklists({ trip }: { trip: Trip }) {
           });
         }}
       >
-        <TabsList className="important:justify-start">
-          {mappedLists.map((list) => (
-            <TabsTrigger key={list.get('id')} value={list.get('id')}>
-              {list.get('name')}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="flex flex-row gap-2 items-start">
+          <div className="flex-1">
+            <CollapsibleSimple open={editingLists}>
+              <H4 className="mx-1 my-2">
+                {startedWithNoLists ? 'Add lists' : 'Edit lists'}
+              </H4>
+              <AddListsPicker trip={trip} className="p-2" />
+            </CollapsibleSimple>
+            <CollapsibleSimple open={!editingLists}>
+              <TabsList className="important:justify-start">
+                {mappedLists.map((list) => (
+                  <ListTab list={list} key={list.get('id')} trip={trip} />
+                ))}
+              </TabsList>
+            </CollapsibleSimple>
+          </div>
+          <Button
+            className="flex-0-0-auto m-1 relative top-2"
+            size="icon"
+            color={editingLists ? 'accent' : 'ghost'}
+            onClick={() => setEditingLists((v) => !v)}
+          >
+            {editingLists ? (
+              <div className="i-solar-check-circle-linear" />
+            ) : (
+              <div className="i-solar-settings-linear" />
+            )}
+          </Button>
+        </div>
         {mappedLists.map((list) => (
           <TabsContent key={list.get('id')} value={list.get('id')}>
             <TripViewChecklist
@@ -117,6 +148,26 @@ function TripViewChecklists({ trip }: { trip: Trip }) {
         ))}
       </TabsRoot>
     </div>
+  );
+}
+
+function ListTab({ trip, list }: { list: List; trip: Trip }) {
+  const { value } = useTripProgress(trip, { listFilter: [list.get('id')] });
+  return (
+    <TabsTrigger
+      value={list.get('id')}
+      className="relative overflow-hidden !border-gray-7"
+    >
+      <span>{list.get('name')}</span>
+      <Progress.Root className="w-full absolute bottom-0 left-0 overflow-hidden rounded-b-full border border-t-solid border-t-gray-4">
+        <Progress.Indicator
+          className="bg-accent w-full h-4px"
+          style={{
+            transform: `translateX(-${100 * (1 - value)}%)`,
+          }}
+        />
+      </Progress.Root>
+    </TabsTrigger>
   );
 }
 
@@ -179,7 +230,7 @@ function TripViewChecklistItem({
 
   const mainOnChecked = (checked: boolean) => {
     if (checked) {
-      onCompletionChanged(computedQuantity);
+      onCompletionChanged(completedQuantity + 1);
     } else {
       onCompletionChanged(0);
     }
@@ -193,31 +244,43 @@ function TripViewChecklistItem({
   };
 
   return (
-    <div className="w-full border border-solid border-gray-4 rounded-lg p-2 flex flex-col gap-2">
+    <div className="w-full p-2 flex flex-col gap-2">
       <div className="w-full flex flex-row items-center gap-2">
-        {computedQuantity === 1 && (
-          <Checkbox
-            checked={completed}
-            onCheckedChange={mainOnChecked}
-            className="w-32px h-32px"
-          />
-        )}
+        <Checkbox
+          checked={completed}
+          onCheckedChange={mainOnChecked}
+          className="w-32px h-32px rounded-full"
+        />
         <label>{description}</label>
         <span className="text-gray-7">×{computedQuantity}</span>
       </div>
-      {computedQuantity > 1 && (
-        <ul className="list-none m-0 p-0 grid grid-cols-[repeat(auto-fit,minmax(32px,1fr))] [grid-auto-rows:32px] items-center gap-1">
-          {Array.from({ length: computedQuantity }).map((_, i) => (
-            <li key={i} className="m-0 p-0 flex-1 min-w-32px">
-              <Checkbox
-                checked={i < completedQuantity}
-                onCheckedChange={subOnChecked}
-                className="w-full h-32px"
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <Progress.Root
+        value={completedQuantity / computedQuantity}
+        className="relative overflow-hidden rounded-full w-full h-12px border border-solid border-gray-4"
+        style={{
+          // Fix overflow clipping in Safari
+          // https://gist.github.com/domske/b66047671c780a238b51c51ffde8d3a0
+          transform: 'translateZ(0)',
+        }}
+      >
+        <Progress.Indicator
+          className="bg-accent w-full h-full transition-transform duration-[300ms] ease-out"
+          style={{
+            transform: `translateX(-${
+              100 * (1 - completedQuantity / computedQuantity)
+            }%)`,
+          }}
+        />
+        {new Array(computedQuantity - 1).fill(0).map((_, i) => (
+          <div
+            key={i}
+            className="w-1px h-full bg-gray-4 absolute top-0 left-0"
+            style={{
+              left: `${(100 / computedQuantity) * (i + 1)}%`,
+            }}
+          />
+        ))}
+      </Progress.Root>
     </div>
   );
 }

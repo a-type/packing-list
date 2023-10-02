@@ -17,4 +17,15 @@ export default defineConfig({
       ],
     },
   },
+  preflights: [
+    {
+      getCSS: () => `
+        #root {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+      `,
+    },
+  ],
 });

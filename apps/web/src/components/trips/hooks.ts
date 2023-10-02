@@ -1,7 +1,11 @@
+import { getComputedQuantity } from '@/components/trips/utils.js';
 import { hooks } from '@/store.js';
-import { Trip } from '@packing-list/verdant';
+import { List, Trip } from '@packing-list/verdant';
 
-export function useTripProgress(trip: Trip) {
+export function useTripProgress(
+  trip: Trip,
+  { listFilter }: { listFilter?: string[] } = {},
+) {
   const { lists, completions } = hooks.useWatch(trip);
   hooks.useWatch(lists);
   hooks.useWatch(completions);
@@ -11,25 +15,51 @@ export function useTripProgress(trip: Trip) {
     .map((id) => allLists.find((l) => l.get('id') === id))
     .filter(function nonNil<T>(x: T | undefined): x is T {
       return x !== undefined;
-    });
+    })
+    .filter((list) => {
+      if (!listFilter) {
+        return true;
+      }
+      return listFilter.includes(list.get('id'));
+    })
+    .map((list) => list.getSnapshot());
 
   const totalItems = mappedLists.reduce((acc, list) => {
-    return acc + list.get('items').length;
+    return (
+      acc +
+      list.items.reduce((acc, item) => {
+        return (
+          acc +
+          getComputedQuantity({
+            quantity: item.quantity,
+            roundDown: item.roundDown,
+            days: trip.get('days'),
+            perDays: item.perDays,
+            additional: item.additional,
+          })
+        );
+      }, 0)
+    );
   }, 0);
 
   // starting from lists because completions may include data
   // from lists that are no longer included
-  const completedItems = lists.getSnapshot().reduce((acc, listId) => {
-    const list = allLists.find((l) => l.get('id') === listId);
-    if (!list) {
-      return acc;
-    }
-    const listItems = list.get('items');
-    const completedQuantities = listItems.getSnapshot().reduce((acc2, item) => {
-      return acc2 + (completions.get(item.id!) ?? 0);
+  const completedItems = lists
+    .getSnapshot()
+    .filter((listId) => !listFilter || listFilter.includes(listId))
+    .reduce((acc, listId) => {
+      const list = allLists.find((l) => l.get('id') === listId);
+      if (!list) {
+        return acc;
+      }
+      const listItems = list.get('items');
+      const completedQuantities = listItems
+        .getSnapshot()
+        .reduce((acc2, item) => {
+          return acc2 + (completions.get(item.id!) ?? 0);
+        }, 0);
+      return acc + completedQuantities;
     }, 0);
-    return acc + completedQuantities;
-  }, 0);
 
   return {
     totalItems,

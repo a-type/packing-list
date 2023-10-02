@@ -1,10 +1,11 @@
 import { HomePage } from './HomePage.jsx';
 import { useCallback } from 'react';
 import { lazyWithPreload as lazy } from 'react-lazy-with-preload';
-import { makeRoutes, Router, Outlet } from '@verdant-web/react-router';
+import { makeRoutes, Router, Outlet, Link } from '@verdant-web/react-router';
 import { updateApp, updateState } from '@/updateState.js';
-import { PageRoot } from '@a-type/ui/components/layouts';
+import { PageNav, PageRoot } from '@a-type/ui/components/layouts';
 import { TopLoader } from '@/components/nav/TopLoader.jsx';
+import { Navigation } from '@/components/nav/Navigation.jsx';
 
 // dynamically import pages that may not be visited
 const JoinPage = lazy(() => import('./JoinPage.jsx'));
@@ -76,6 +77,7 @@ export function Pages() {
         <Outlet />
         <TopLoader />
       </Router>
+      <Navigation />
     </PageRoot>
   );
 }
