@@ -63,7 +63,7 @@ function TripViewInfo({ trip }: { trip: Trip }) {
       <LiveUpdateTextField
         value={name}
         onChange={(v) => trip.set('name', v)}
-        className="text-xl"
+        className="text-xl w-full"
       />
       <p>Created on {new Date(createdAt).toLocaleDateString()}</p>
       {/* TODO: date picker */}
