@@ -96,8 +96,8 @@ importers:
   apps/web:
     dependencies:
       '@a-type/ui':
-        specifier: ^0.1.12
-        version: 0.1.12(@types/react-dom@18.2.7)(@types/react@18.2.21)
+        specifier: ^0.1.14
+        version: 0.1.14(@types/react-dom@18.2.7)(@types/react@18.2.21)
       '@a-type/utils':
         specifier: ^1.0.4
         version: 1.0.4
@@ -229,8 +229,8 @@ importers:
 
 packages:
 
-  /@a-type/ui@0.1.12(@types/react-dom@18.2.7)(@types/react@18.2.21):
-    resolution: {integrity: sha512-VWE7E99jWj6aVL/bdRhwRpIxnemsXec9peOcTANR/EoHPlCePVZ91SsQBjsrTmJZIVwpXFJRzAOpxnNzhU4flA==}
+  /@a-type/ui@0.1.14(@types/react-dom@18.2.7)(@types/react@18.2.21):
+    resolution: {integrity: sha512-cgSsgU+i7qDkbN09Wa8NSksmPtjqDFctzDuwTsBIi4LnYz+K8lU7fRtHY3hzGOWWCCudUq/IKq1KtiV9iBOdvw==}
     dependencies:
       '@a-type/utils': 1.0.4
       '@radix-ui/react-accordion': 1.1.2(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
