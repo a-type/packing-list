@@ -1,6 +1,7 @@
 import { hooks } from '@/store.js';
 import { Button } from '@a-type/ui/components/button';
 import { Trip } from '@packing-list/verdant';
+import { Link } from '@verdant-web/react-router';
 import classNames from 'classnames';
 
 export interface AddListsPickerProps {
@@ -47,6 +48,15 @@ export function AddListsPicker({ trip, className }: AddListsPickerProps) {
           </Button>
         );
       })}
+      {!lists.length && (
+        <div className="italic text-gray-7">
+          You have no lists yet.{' '}
+          <Link to="/lists" className="text-primary-dark">
+            Create one
+          </Link>
+          ?
+        </div>
+      )}
     </div>
   );
 }
