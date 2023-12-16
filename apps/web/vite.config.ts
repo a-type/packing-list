@@ -50,7 +50,7 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    exclude: [],
+    exclude: ['@a-type/ui'],
     include: ['react/jsx-runtime', 'react', 'react-dom'],
   },
   resolve: {

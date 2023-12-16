@@ -17,9 +17,10 @@ export interface TripDateRangeProps {
   trip: Trip;
 }
 
+const nbsp = '\u00A0'; // non-breaking space
 // day, month date(th)
 function formatDay(date: Date) {
-  return format(date, 'EEEE, MMM do');
+  return format(date, `EEE,${nbsp}MMM${nbsp}do`);
 }
 
 export function TripDateRange({ trip }: TripDateRangeProps) {
@@ -28,9 +29,9 @@ export function TripDateRange({ trip }: TripDateRangeProps) {
 
   const displayString =
     startsAt && endsAt
-      ? `${days} days: ${formatDay(new Date(startsAt))} - ${formatDay(
+      ? `${formatDay(new Date(startsAt))} - ${formatDay(
           new Date(endsAt),
-        )}`
+        )} (${days} days)`
       : 'Select dates';
 
   const value = {
@@ -53,7 +54,11 @@ export function TripDateRange({ trip }: TripDateRangeProps) {
       <PopoverTrigger asChild>
         <Button
           color={days === 0 ? 'primary' : 'ghost'}
-          className={days === 0 ? '' : 'font-normal'}
+          className={
+            days === 0
+              ? ''
+              : 'font-normal text-wrap text-start text-sm sm:text-md'
+          }
         >
           <Icon name="calendar" />
           <span>{displayString}</span>
