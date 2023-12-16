@@ -8,9 +8,6 @@ import { TopLoader } from '@/components/nav/TopLoader.jsx';
 import { Navigation } from '@/components/nav/Navigation.jsx';
 
 // dynamically import pages that may not be visited
-const JoinPage = lazy(() => import('./JoinPage.jsx'));
-const ClaimInvitePage = lazy(() => import('./ClaimInvitePage.jsx'));
-const SettingsPage = lazy(() => import('./SettingsPage.jsx'));
 const ListsPage = lazy(() => import('./ListsPage.jsx'));
 const ListPage = lazy(() => import('./ListPage.jsx'));
 const TripsPage = lazy(() => import('./TripsPage.jsx'));
@@ -49,18 +46,6 @@ const routes = makeRoutes([
       ListPage.preload();
       TripsPage.preload();
     },
-  },
-  {
-    path: '/join',
-    component: JoinPage,
-  },
-  {
-    path: '/claim/:inviteId',
-    component: ClaimInvitePage,
-  },
-  {
-    path: '/settings',
-    component: SettingsPage,
   },
 ]);
 

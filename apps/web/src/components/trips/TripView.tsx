@@ -1,5 +1,19 @@
+import { AddListsPicker } from '@/components/trips/AddListsPicker.jsx';
+import { useTripDays, useTripProgress } from '@/components/trips/hooks.js';
+import { getComputedQuantity } from '@/components/trips/utils.js';
 import { hooks } from '@/store.js';
+import { Button } from '@a-type/ui/components/button';
+import { Checkbox } from '@a-type/ui/components/checkbox';
+import { CollapsibleSimple } from '@a-type/ui/components/collapsible';
+import { LiveUpdateTextField } from '@a-type/ui/components/liveUpdateTextField';
 import { NumberStepper } from '@a-type/ui/components/numberStepper';
+import {
+  TabsContent,
+  TabsList,
+  TabsRoot,
+  TabsTrigger,
+} from '@a-type/ui/components/tabs';
+import { H4 } from '@a-type/ui/components/typography';
 import {
   List,
   ListItemsItem,
@@ -7,35 +21,11 @@ import {
   TripCompletions,
   TripCompletionsValue,
 } from '@packing-list/verdant';
-import { Checkbox } from '@a-type/ui/components/checkbox';
-import { getComputedQuantity } from '@/components/trips/utils.js';
-import { useEffect, useState } from 'react';
-import {
-  Select,
-  SelectItem,
-  SelectContent,
-  SelectTrigger,
-  SelectValue,
-} from '@a-type/ui/components/select';
-import { AddListsPicker } from '@/components/trips/AddListsPicker.jsx';
-import { useSearchParams } from '@verdant-web/react-router';
-import {
-  TabsContent,
-  TabsList,
-  TabsRoot,
-  TabsTrigger,
-} from '@a-type/ui/components/tabs';
-import { LiveUpdateTextField } from '@a-type/ui/components/liveUpdateTextField';
-import {
-  CollapsibleContent,
-  CollapsibleRoot,
-  CollapsibleSimple,
-} from '@a-type/ui/components/collapsible';
-import { Button } from '@a-type/ui/components/button';
-import { H4 } from '@a-type/ui/components/typography';
 import * as Progress from '@radix-ui/react-progress';
-import { Icon } from '@a-type/ui/components/icon';
-import { useTripProgress } from '@/components/trips/hooks.js';
+import { useSearchParams } from '@verdant-web/react-router';
+import { useState } from 'react';
+import { TripDateRange } from './TripDateRange.jsx';
+import classNames from 'classnames';
 
 export interface TripViewProps {
   tripId: string;
@@ -49,7 +39,7 @@ export function TripView({ tripId }: TripViewProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full h-full">
       <TripViewInfo trip={trip} />
       <TripViewChecklists trip={trip} />
     </div>
@@ -57,30 +47,27 @@ export function TripView({ tripId }: TripViewProps) {
 }
 
 function TripViewInfo({ trip }: { trip: Trip }) {
-  const { name, createdAt, days } = hooks.useWatch(trip);
+  const { name, startsAt, endsAt } = hooks.useWatch(trip);
   return (
-    <div>
+    <div
+      className={classNames('flex flex-col items-start transition', {
+        'gap-10': !startsAt || !endsAt,
+        'gap-1': startsAt && endsAt,
+      })}
+    >
       <LiveUpdateTextField
         value={name}
         onChange={(v) => trip.set('name', v)}
         className="text-xl w-full"
       />
-      <p>Created on {new Date(createdAt).toLocaleDateString()}</p>
-      {/* TODO: date picker */}
-      <div className="flex flex-row items-center gap-2">
-        <NumberStepper
-          value={days}
-          increment={1}
-          onChange={(v) => trip.set('days', v)}
-        />
-        <span>days</span>
-      </div>
+      <TripDateRange trip={trip} />
     </div>
   );
 }
 
 function TripViewChecklists({ trip }: { trip: Trip }) {
-  const { lists, days, completions } = hooks.useWatch(trip);
+  const { lists, completions } = hooks.useWatch(trip);
+  const days = useTripDays(trip);
   hooks.useWatch(lists);
   const allLists = hooks.useAllLists();
 
@@ -95,6 +82,14 @@ function TripViewChecklists({ trip }: { trip: Trip }) {
 
   const [editingLists, setEditingLists] = useState(lists.length === 0);
   const [startedWithNoLists] = useState(editingLists);
+
+  if (!days) {
+    return (
+      <div className="w-full flex-1 flex flex-col items-center justify-center text-gray-7">
+        <div>Select dates to get started</div>
+      </div>
+    );
+  }
 
   return (
     <div>

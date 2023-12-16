@@ -72,10 +72,6 @@ const trips = collection({
         type: 'string',
       },
     },
-    days: {
-      type: 'number',
-      default: 1,
-    },
     name: {
       type: 'string',
       default: 'New Trip',
@@ -86,11 +82,19 @@ const trips = collection({
         type: 'number',
       },
     },
+    startsAt: {
+      type: 'number',
+      nullable: true,
+    },
+    endsAt: {
+      type: 'number',
+      nullable: true,
+    },
   },
 });
 
 export default schema({
-  version: 1,
+  version: 2,
   collections: {
     lists,
     trips,

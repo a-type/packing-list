@@ -47,7 +47,7 @@ function ListItemsEditor({ list }: { list: List }) {
           />
         </li>
       ))}
-      <li>
+      <li className="self-center justify-self-center">
         <AddListItemButton list={list} />
       </li>
     </ul>
@@ -176,7 +176,7 @@ function AddListItemButton({ list }: { list: List }) {
   return (
     <Button
       color="default"
-      className="w-full h-full items-center justify-center"
+      className="w-full h-full items-center justify-center self-center -justify-self-center"
       onClick={() =>
         items.push({
           description: 'New item',

@@ -37,7 +37,7 @@ export function TripsList({}: TripsListProps) {
 }
 
 function TripsListItem({ trip }: { trip: Trip }) {
-  const { name, createdAt } = hooks.useWatch(trip);
+  const { name, startsAt } = hooks.useWatch(trip);
 
   const {
     value: completion,
@@ -59,8 +59,8 @@ function TripsListItem({ trip }: { trip: Trip }) {
         </Link>
       </CardMain>
       <CardFooter className="text-xs">
-        {new Date(createdAt).toLocaleDateString()} | {completedItems} /{' '}
-        {totalItems} items
+        {startsAt ? new Date(startsAt).toLocaleDateString() : 'Unscheduled'} |{' '}
+        {completedItems} / {totalItems} items
       </CardFooter>
     </CardRoot>
   );

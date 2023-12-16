@@ -3,12 +3,7 @@ import type {
   Client,
   ClientDescriptor,
   Schema,
-  List,
-  ListFilter,
-  Trip,
-  TripFilter,
-} from "./index.js";
-import type {
+  QueryStatus,
   UserInfo,
   ObjectEntity,
   ListEntity,
@@ -18,9 +13,13 @@ import type {
   AnyEntity,
   EntityDestructured,
   EntityFile,
-} from "@verdant-web/store";
+  List,
+  ListFilter,
+  Trip,
+  TripFilter,
+} from "./index.js";
 
-type SkippableFilterConfig<F> = {
+type HookConfig<F> = {
   index?: F;
   skip?: boolean;
   key?: string;
@@ -49,22 +48,22 @@ export interface GeneratedHooks<Presence, Profile> {
   usePeer: (peerId: string | null) => UserInfo<Profile, Presence> | null;
   useFindPeer: (
     query: (peer: UserInfo<Profile, Presence>) => boolean,
-    options?: { includeSelf: boolean }
+    options?: { includeSelf: boolean },
   ) => UserInfo<Profile, Presence> | null;
   useFindPeers: (
     query: (peer: UserInfo<Profile, Presence>) => boolean,
-    options?: { includeSelf: boolean }
+    options?: { includeSelf: boolean },
   ) => UserInfo<Profile, Presence>[];
   useSyncStatus: () => boolean;
   useWatch<T extends AnyEntity<any, any, any> | null>(
-    entity: T
+    entity: T,
   ): EntityDestructured<T>;
   useWatch<
     T extends AnyEntity<any, any, any> | null,
-    P extends keyof EntityShape<T>
+    P extends keyof EntityShape<T>,
   >(
     entity: T,
-    prop: P
+    prop: P,
   ): EntityDestructured<T>[P];
   useWatch<T extends EntityFile | null>(file: T): string | null;
   useUndo(): () => void;
@@ -82,16 +81,29 @@ export interface GeneratedHooks<Presence, Profile> {
   useSync(isOn: boolean): void;
 
   useList(id: string, config?: { skip?: boolean }): List | null;
-  useOneList: <Config extends SkippableFilterConfig<ListFilter>>(
-    config?: Config
+  useListUnsuspended(
+    id: string,
+    config?: { skip?: boolean },
+  ): { data: List | null; status: QueryStatus };
+  useOneList: <Config extends HookConfig<ListFilter>>(
+    config?: Config,
   ) => List | null;
-  useAllLists: <Config extends SkippableFilterConfig<ListFilter>>(
-    config?: Config
+  useOneListsUnsuspended: <Config extends HookConfig<ListFilter>>(
+    config?: Config,
+  ) => { data: List | null; status: QueryStatus };
+  useAllLists: <Config extends HookConfig<ListFilter>>(
+    config?: Config,
   ) => List[];
+  useAllListsUnsuspended: <Config extends HookConfig<ListFilter>>(
+    config?: Config,
+  ) => { data: List[]; status: QueryStatus };
   useAllListsPaginated: <
-    Config extends SkippableFilterConfig<ListFilter> & { pageSize?: number }
+    Config extends HookConfig<ListFilter> & {
+      pageSize?: number;
+      suspend?: false;
+    },
   >(
-    config?: Config
+    config?: Config,
   ) => [
     List[],
     {
@@ -100,25 +112,45 @@ export interface GeneratedHooks<Presence, Profile> {
       setPage: (page: number) => void;
       hasNext: boolean;
       hasPrevious: boolean;
-    }
+      status: QueryStatus;
+    },
   ];
   useAllListsInfinite: <
-    Config extends SkippableFilterConfig<ListFilter> & { pageSize?: number }
+    Config extends HookConfig<ListFilter> & {
+      pageSize?: number;
+      suspend?: false;
+    },
   >(
-    config?: Config
-  ) => [List[], { loadMore: () => void; hasMore: boolean }];
+    config?: Config,
+  ) => [
+    List[],
+    { loadMore: () => void; hasMore: boolean; status: QueryStatus },
+  ];
 
   useTrip(id: string, config?: { skip?: boolean }): Trip | null;
-  useOneTrip: <Config extends SkippableFilterConfig<TripFilter>>(
-    config?: Config
+  useTripUnsuspended(
+    id: string,
+    config?: { skip?: boolean },
+  ): { data: Trip | null; status: QueryStatus };
+  useOneTrip: <Config extends HookConfig<TripFilter>>(
+    config?: Config,
   ) => Trip | null;
-  useAllTrips: <Config extends SkippableFilterConfig<TripFilter>>(
-    config?: Config
+  useOneTripsUnsuspended: <Config extends HookConfig<TripFilter>>(
+    config?: Config,
+  ) => { data: Trip | null; status: QueryStatus };
+  useAllTrips: <Config extends HookConfig<TripFilter>>(
+    config?: Config,
   ) => Trip[];
+  useAllTripsUnsuspended: <Config extends HookConfig<TripFilter>>(
+    config?: Config,
+  ) => { data: Trip[]; status: QueryStatus };
   useAllTripsPaginated: <
-    Config extends SkippableFilterConfig<TripFilter> & { pageSize?: number }
+    Config extends HookConfig<TripFilter> & {
+      pageSize?: number;
+      suspend?: false;
+    },
   >(
-    config?: Config
+    config?: Config,
   ) => [
     Trip[],
     {
@@ -127,13 +159,20 @@ export interface GeneratedHooks<Presence, Profile> {
       setPage: (page: number) => void;
       hasNext: boolean;
       hasPrevious: boolean;
-    }
+      status: QueryStatus;
+    },
   ];
   useAllTripsInfinite: <
-    Config extends SkippableFilterConfig<TripFilter> & { pageSize?: number }
+    Config extends HookConfig<TripFilter> & {
+      pageSize?: number;
+      suspend?: false;
+    },
   >(
-    config?: Config
-  ) => [Trip[], { loadMore: () => void; hasMore: boolean }];
+    config?: Config,
+  ) => [
+    Trip[],
+    { loadMore: () => void; hasMore: boolean; status: QueryStatus },
+  ];
 }
 
 type HookName = `use${string}`;
@@ -141,16 +180,16 @@ type HookWithoutClient<
   Hook extends <TArgs extends any[], TRet>(
     client: Client,
     ...args: Targs
-  ) => TRet
+  ) => TRet,
 > = (...args: TArgs) => TRet;
 export function createHooks<
   Presence = any,
   Profile = any,
   Mutations extends {
     [N: HookName]: (client: Client<Presence, Profile>, ...args: any[]) => any;
-  } = never
+  } = never,
 >(
-  mutations?: Mutations
+  mutations?: Mutations,
 ): GeneratedHooks<Presence, Profile> & {
   withMutations: <
     Mutations extends {
@@ -158,9 +197,9 @@ export function createHooks<
         client: Client<Presence, Profile>,
         ...args: any[]
       ) => unknown;
-    }
+    },
   >(
-    mutations: Mutations
+    mutations: Mutations,
   ) => GeneratedHooks<Presence, Profile> & {
     [MutHook in keyof Mutations]: HookWithoutClient<Mutations[MutHook]>;
   };

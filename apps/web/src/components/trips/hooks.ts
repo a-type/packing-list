@@ -7,6 +7,7 @@ export function useTripProgress(
   { listFilter }: { listFilter?: string[] } = {},
 ) {
   const { lists, completions } = hooks.useWatch(trip);
+  const days = useTripDays(trip);
   hooks.useWatch(lists);
   hooks.useWatch(completions);
   const allLists = hooks.useAllLists();
@@ -33,7 +34,7 @@ export function useTripProgress(
           getComputedQuantity({
             quantity: item.quantity,
             roundDown: item.roundDown,
-            days: trip.get('days'),
+            days,
             perDays: item.perDays,
             additional: item.additional,
           })
@@ -66,4 +67,12 @@ export function useTripProgress(
     completedItems,
     value: completedItems / totalItems,
   };
+}
+
+export function useTripDays(trip: Trip) {
+  const { startsAt, endsAt } = hooks.useWatch(trip);
+  if (!startsAt || !endsAt) {
+    return 0;
+  }
+  return Math.round((endsAt - startsAt) / 86400000) + 1;
 }

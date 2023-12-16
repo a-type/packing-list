@@ -1,9 +1,9 @@
 import { useIsLoggedIn } from '@/hooks/useSession.js';
 import { Pages } from '@/pages/Pages.jsx';
 import { clientDescriptor, hooks } from '@/store.js';
+import { IconSpritesheet } from '@a-type/ui/components/icon';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode, Suspense, useState } from 'react';
-import { CompleteSubscription } from './components/subscription/CompleteSubscription.jsx';
 
 export interface AppProps {}
 
@@ -15,7 +15,7 @@ export function App({}: AppProps) {
       <QueryClientProvider client={queryClient}>
         <LofiProvider>
           <Pages />
-          <CompleteSubscription />
+          <IconSpritesheet />
         </LofiProvider>
       </QueryClientProvider>
     </Suspense>
