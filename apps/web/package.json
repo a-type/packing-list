@@ -24,6 +24,7 @@
     "date-fns": "^2.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-lazy-with-preload": "^2.2.1",
     "unocss": "^0.54.1",
     "valtio": "^1.11.2",

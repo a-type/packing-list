@@ -15,11 +15,14 @@ const update = registerSW({
   onRegisteredSW(swUrl, registration) {
     console.log('Service worker registered', swUrl);
     if (registration) {
-      setInterval(() => {
-        registration.update();
-        check = registration.update;
-        // hourly
-      }, 60 * 60 * 1000);
+      setInterval(
+        () => {
+          registration.update();
+          check = registration.update;
+          // hourly
+        },
+        60 * 60 * 1000,
+      );
     }
   },
   onRegisterError(error) {
@@ -28,7 +31,11 @@ const update = registerSW({
 });
 
 export async function updateApp(reload?: boolean) {
+  let timeout = setTimeout(() => {
+    window.location.reload();
+  }, 5000);
   await update(!!reload);
+  clearTimeout(timeout);
 }
 
 export function checkForUpdate() {

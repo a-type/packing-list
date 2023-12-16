@@ -4,6 +4,7 @@ import { clientDescriptor, hooks } from '@/store.js';
 import { IconSpritesheet } from '@a-type/ui/components/icon';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode, Suspense, useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 
 export interface AppProps {}
 
@@ -16,6 +17,10 @@ export function App({}: AppProps) {
         <LofiProvider>
           <Pages />
           <IconSpritesheet />
+          <Toaster
+            position="bottom-center"
+            containerClassName="mb-10 sm:mb-0"
+          />
         </LofiProvider>
       </QueryClientProvider>
     </Suspense>
