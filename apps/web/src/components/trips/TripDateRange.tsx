@@ -51,7 +51,10 @@ export function TripDateRange({ trip }: TripDateRangeProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button color="ghost" size="small" className="font-normal">
+        <Button
+          color={days === 0 ? 'primary' : 'ghost'}
+          className={days === 0 ? '' : 'font-normal'}
+        >
           <Icon name="calendar" />
           <span>{displayString}</span>
         </Button>
